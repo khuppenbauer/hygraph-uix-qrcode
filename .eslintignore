@@ -1,0 +1,7 @@
+.cache
+.history
+build/**
+functions-build/**
+node_modules/**
+public/**
+static/**

@@ -1,0 +1,19 @@
+{
+  "name": "hygraph-uix-qrcode",
+  "version": "1.0.0",
+  "author": "Kerstin Huppenbauer",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint --ext .js,.jsx . src/"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/eslint-parser": "^7.19.1",
+    "eslint": "^8.26.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  }
+}
