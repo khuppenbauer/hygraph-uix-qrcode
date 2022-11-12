@@ -1,17 +1,11 @@
 import React from 'react';
-import { Wrapper } from '@graphcms/uix-react-sdk';
-
-const declaration = {
-  extensionType: 'formSidebar',
-  name: 'Name',
-  description: 'Description',
-};
+import QrCode from './components/QrCode';
 
 function App() {
   return (
-    <Wrapper declaration={declaration}>
-      Hello World
-    </Wrapper>
+    <div className="App">
+      <QrCode />
+    </div>
   );
 }
 
