@@ -6,8 +6,8 @@ import './qrcode.css';
 
 const canvasWidth = 600;
 
-const download = (slug, text, darkColorHex, lightColorHex, width, frame, logo) => {
-  const img = createQrCode(text, darkColorHex, lightColorHex, width, frame, logo);
+const download = async (slug, text, darkColorHex, lightColorHex, width, frame, logo) => {
+  const img = await createQrCode(text, darkColorHex, lightColorHex, width, frame, logo);
   const link = document.createElement('a');
   link.download = `${slug}.png`;
   link.href = img.toDataURL();
@@ -19,7 +19,7 @@ const upload = async (
   slug, pageId, text, darkColorHex, lightColorHex, width, frame, logo, qrCodeId, imageId, setReadyState,
 ) => {
   setReadyState(true);
-  const qrCode = createQrCode(text, darkColorHex, lightColorHex, width, frame, logo);
+  const qrCode = await createQrCode(text, darkColorHex, lightColorHex, width, frame, logo);
   const asset = await uploadQrCode(slug, qrCode);
   if (asset) {
     await conncectQrCode(asset.id, lightColorHex, darkColorHex, pageId, qrCodeId, imageId);
@@ -84,12 +84,17 @@ const QrCodePreview = () => {
     const darkColorHex = rgb2hex(darkColor.rgba);
     const imageId = qrCode.image?.id || null;
     const { frame, logo, id: qrCodeId } = qrCode;
-    const canvas = createQrCode(text, darkColorHex, lightColorHex, canvasWidth, frame, logo);
+    createQrCode(text, darkColorHex, lightColorHex, canvasWidth, frame, logo).then((canvas) => {
+      const img = document.getElementById('qrCodeImage');
+      if (img && canvas) {
+        img.src = canvas.toDataURL();
+      }
+    });
     const width = qrCode.width || canvasWidth;
     const className = readyState === true ? 'button button--loading' : 'button';
     return (
       <>
-        <img id="qrCodeImage" width="200" src={canvas.toDataURL()} />
+        <img id="qrCodeImage" width="200" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
         <button
           onClick={() => download(slug, text, darkColorHex, lightColorHex, width, frame, logo)}
         >

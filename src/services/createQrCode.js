@@ -1,5 +1,5 @@
 import QRCode from 'qrcode';
-import { createCanvas } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 
 const fontSizes = [
   46, 48, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0,
@@ -65,7 +65,7 @@ const addText = (ctx, framePosition, width, innerSize, frame, frameColorHex) => 
   });
 };
 
-const addQrCode = (ctx, text, darkColorHex, lightColorHex, innerSize, frame, width, height, logo) => {
+const addQrCode = async (ctx, text, darkColorHex, lightColorHex, innerSize, frame, width, height, logo) => {
   const qrCodeCanvas = createCanvas(innerSize, innerSize);
   QRCode.toCanvas(
     qrCodeCanvas,
@@ -88,9 +88,7 @@ const addQrCode = (ctx, text, darkColorHex, lightColorHex, innerSize, frame, wid
 
   if (logo && logo.logo) {
     const { logo: { url } } = logo;
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.src = url;
+    const img = await loadImage(url, { crossOrigin: 'Anonymous' });
     const maxWidth = innerSize - 80;
     let logoWidth = img.width;
     let logoHeight = img.height;
@@ -190,7 +188,7 @@ const addFrame = (ctx, frame, frameColorHex, width, height) => {
   }
 };
 
-export const createQrCode = (text, darkColorHex, lightColorHex, width, frame, logo) => {
+export const createQrCode = async (text, darkColorHex, lightColorHex, width, frame, logo) => {
   const innerSize = frame ? width - margin * 2 : width;
   const height = frame && frame.text ? calculateHeight(innerSize, frame.text) : width;
   const canvas = createCanvas(width, height);
@@ -206,6 +204,6 @@ export const createQrCode = (text, darkColorHex, lightColorHex, width, frame, lo
     }
   }
 
-  addQrCode(ctx, text, darkColorHex, lightColorHex, innerSize, frame, width, height, logo);
+  await addQrCode(ctx, text, darkColorHex, lightColorHex, innerSize, frame, width, height, logo);
   return canvas;
 };
