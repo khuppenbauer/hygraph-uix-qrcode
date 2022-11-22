@@ -84,13 +84,13 @@ const QrCodePreview = () => {
     const darkColorHex = rgb2hex(darkColor.rgba);
     const imageId = qrCode.image?.id || null;
     const { frame, logo, id: qrCodeId } = qrCode;
-    createQrCode(text, darkColorHex, lightColorHex, canvasWidth, frame, logo).then((canvas) => {
+    const width = qrCode.width || canvasWidth;
+    createQrCode(text, darkColorHex, lightColorHex, width, frame, logo).then((canvas) => {
       const img = document.getElementById('qrCodeImage');
       if (img && canvas) {
         img.src = canvas.toDataURL();
       }
     });
-    const width = qrCode.width || canvasWidth;
     const className = readyState === true ? 'button button--loading' : 'button';
     return (
       <>
