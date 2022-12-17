@@ -173,9 +173,9 @@ const addRoundRect = (ctx, frameLeft, frameTop, frameWidth, frameHeight, frameBa
 };
 
 const addFrame = (ctx, frame, frameColorHex, width, height) => {
-  const lineWidth = width / 100;
   const frameTop = lineWidth / 2;
   const frameLeft = lineWidth / 2;
+  const lineWidth = width / 50;
   const frameWidth = width - lineWidth;
   const frameHeight = height - lineWidth;
   const { backgroundColor, style } = frame;
