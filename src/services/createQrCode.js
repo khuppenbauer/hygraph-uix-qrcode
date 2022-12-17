@@ -58,8 +58,7 @@ const addText = (ctx, framePosition, width, innerSize, margin, frame, frameColor
     const { text, size } = textItem;
     ctx.fillStyle = frameColorHex;
     ctx.textBaseline = 'top';
-    ctx.font = `${size}px sans-serif`;
-    console.log(size);
+    ctx.font = `bold ${size}px sans-serif`;
     const left = (width - ctx.measureText(text).width) / 2;
     ctx.fillText(text, left, top);
     top += size + textMargin;
