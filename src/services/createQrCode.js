@@ -6,6 +6,7 @@ const fontSizes = [
 ];
 
 const textMargin = 7;
+const canvasMargin = 100;
 
 export const rgb2hex = (rgba) => {
   const { r, g, b } = rgba;
@@ -33,6 +34,7 @@ const parseText = (width, text) => {
       return {
         text: textItem,
         size,
+        width: textDimensions.width,
       };
     });
   }
@@ -51,6 +53,26 @@ const calculateHeight = (width, margin, text) => {
   return width;
 };
 
+const addTitle = (ctx, framePosition, width, height, frame, frameColorHex) => {
+  const top = framePosition === 'top' ? height + (canvasMargin / 2) - (width / 50) - 1 : canvasMargin / 2;
+  const { backgroundColor, title } = frame;
+  let backgroundColorHex = '#ffff00';
+  if (backgroundColor) {
+    backgroundColorHex = rgb2hex(backgroundColor.rgba);
+  }
+  ctx.fillStyle = backgroundColorHex;
+  const [textItems] = parseText(width / 2, title);
+  const { size, width: titleWidth } = textItems;
+  const left = (width / 2) - ((titleWidth + 50) / 2) + (canvasMargin / 2);
+  ctx.fillRect(left, top, titleWidth + 50, (width / 50 + 1));
+
+  const textLeft = (width / 2) - ((titleWidth + 25) / 2) + (canvasMargin / 2);
+  ctx.fillStyle = frameColorHex;
+  ctx.textBaseline = 'top';
+  ctx.font = `bold ${size}px sans-serif`;
+  ctx.fillText(title, textLeft, top - textMargin);
+};
+
 const addText = (ctx, framePosition, width, innerSize, margin, frame, frameColorHex) => {
   let top = framePosition === 'top' ? margin : width - textMargin;
   const textItems = parseText(innerSize, frame.text);
@@ -60,19 +82,20 @@ const addText = (ctx, framePosition, width, innerSize, margin, frame, frameColor
     ctx.textBaseline = 'top';
     ctx.font = `bold ${size}px sans-serif`;
     const left = (width - ctx.measureText(text).width) / 2;
-    ctx.fillText(text, left, top);
+    ctx.fillText(text, left + (canvasMargin / 2), top + (canvasMargin / 2));
     top += size + textMargin;
   });
 };
 
 const addQrCode = async (ctx, text, darkColorHex, lightColorHex, innerSize, margin, frame, width, height, logo) => {
+  const qrWidth = innerSize * 0.9;
   const qrCodeCanvas = createCanvas(innerSize, innerSize);
   QRCode.toCanvas(
     qrCodeCanvas,
     text,
     {
-      width: innerSize,
-      margin: 2,
+      width: qrWidth,
+      margin: 0,
       color: {
         dark: darkColorHex || '#000000',
         light: lightColorHex || '#ffffff',
@@ -81,10 +104,12 @@ const addQrCode = async (ctx, text, darkColorHex, lightColorHex, innerSize, marg
   );
 
   let innerTop = frame ? margin : 0;
-  const innerLeft = frame ? margin : 0;
+  let innerLeft = frame ? margin : 0;
   if (frame && frame.position === 'top') {
     innerTop = height - width + margin;
   }
+  innerTop += (canvasMargin / 2) + innerSize * 0.05;
+  innerLeft += (canvasMargin / 2) + innerSize * 0.05;
   ctx.drawImage(qrCodeCanvas, innerLeft, innerTop);
 
   if (logo && logo.logo) {
@@ -106,8 +131,8 @@ const addQrCode = async (ctx, text, darkColorHex, lightColorHex, innerSize, marg
     }
     const logoX = logoWidth / 6;
     const logoY = logoHeight / 6;
-    const logoTop = innerTop + innerSize / 2 - logoHeight / 2;
-    const logoLeft = innerLeft + innerSize / 2 - logoWidth / 2;
+    const logoTop = innerTop + qrWidth / 2 - logoHeight / 2;
+    const logoLeft = innerLeft + qrWidth / 2 - logoWidth / 2;
     ctx.fillStyle = lightColorHex || '#ffffff';
     ctx.fillRect(
       logoLeft - logoX,
@@ -172,17 +197,14 @@ const addRoundRect = (ctx, frameLeft, frameTop, frameWidth, frameHeight, frameBa
   ctx.stroke();
 };
 
-const addFrame = (ctx, frame, frameColorHex, width, height) => {
-  const frameTop = lineWidth / 2;
-  const frameLeft = lineWidth / 2;
+const addFrame = (ctx, frame, frameColorHex, backgroundColorHex, width, height) => {
   const lineWidth = width / 50;
+  const frameTop = (lineWidth / 2) + (canvasMargin / 2);
+  const frameLeft = (lineWidth / 2) + (canvasMargin / 2);
   const frameWidth = width - lineWidth;
   const frameHeight = height - lineWidth;
   const { backgroundColor, style } = frame;
-  if (backgroundColor) {
-    const backgroundColorHex = rgb2hex(backgroundColor.rgba);
-    ctx.fillStyle = backgroundColorHex;
-  }
+  ctx.fillStyle = backgroundColorHex;
   if (style) {
     const radius = style === 'square' ? 0 : 20;
     ctx.strokeStyle = frameColorHex;
@@ -197,14 +219,22 @@ export const createQrCode = async (text, darkColorHex, lightColorHex, width, fra
   const margin = width / 20;
   const innerSize = frame ? width - margin * 2 : width;
   const height = frame && frame.text ? calculateHeight(innerSize, margin, frame.text) : width;
-  const canvas = createCanvas(width, height);
+  const canvas = createCanvas(width + canvasMargin, height + canvasMargin);
   const ctx = canvas.getContext('2d');
 
   if (frame) {
     const frameColor = frame.color || { rgba: { r: 0, g: 0, b: 0 } };
     const frameColorHex = rgb2hex(frameColor.rgba);
-    addFrame(ctx, frame, frameColorHex, width, height);
+    const frameBackgroundColor = frame.backgroundColor || { rgba: { r: 255, g: 255, b: 255 } };
+    const frameBackgroundColorHex = rgb2hex(frameBackgroundColor.rgba);
+    ctx.fillStyle = frameBackgroundColorHex;
+    ctx.fillRect(0, 0, width + canvasMargin, height + canvasMargin);
+
+    addFrame(ctx, frame, frameColorHex, frameBackgroundColorHex, width, height);
     const framePosition = frame.position || 'bottom';
+    if (frame.title) {
+      addTitle(ctx, framePosition, width, height, frame, frameColorHex);
+    }
     if (frame.text) {
       addText(ctx, framePosition, width, innerSize, margin, frame, frameColorHex);
     }
