@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@graphcms/uix-react-sdk": "^0.2.7",
-    "axios": "^1.1.3",
+    "axios": "^1.6.0",
     "canvas": "^2.10.2",
     "dotenv": "^16.0.3",
     "encoding": "^0.1.13",
