@@ -64,7 +64,7 @@ const addTitle = (ctx, framePosition, width, height, frame, frameColorHex) => {
   const [textItems] = parseText(width / 2, title);
   const { size, width: titleWidth } = textItems;
   const left = (width / 2) - ((titleWidth + 50) / 2) + (canvasMargin / 2);
-  ctx.fillRect(left, top, titleWidth + 50, (width / 50 + 1));
+  ctx.fillRect(left, top - 5, titleWidth + 50, (width / 50 + 10));
 
   const textLeft = (width / 2) - ((titleWidth + 25) / 2) + (canvasMargin / 2);
   ctx.fillStyle = frameColorHex;
